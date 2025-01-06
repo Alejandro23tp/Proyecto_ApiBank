@@ -36,8 +36,11 @@ COPY . /var/www
 # Ejecutar Composer nuevamente para instalar dependencias
 RUN composer install
 
+# Copiar el script de inicio
+COPY start.sh /var/www/start.sh
+
 # Exponer el puerto 9000
 EXPOSE 9000
 
-# Comando para servir la aplicación de Laravel
-CMD php artisan migrate && php artisan serve
+# Usar el script de inicio
+CMD ["sh", "/var/www/start.sh"]
