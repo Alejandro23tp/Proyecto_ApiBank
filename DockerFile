@@ -35,6 +35,8 @@ COPY . /var/www
 # Ejecutar Composer nuevamente para instalar dependencias
 RUN composer install
 
-# Exponer el puerto 9000 y ejecutar PHP-FPM
+# Exponer el puerto 9000
 EXPOSE 9000
-CMD ["php-fpm"]
+
+# Comando para servir la aplicación de Laravel
+CMD php artisan serve
