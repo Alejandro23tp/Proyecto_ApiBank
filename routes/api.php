@@ -16,6 +16,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+
+
 Rest::resource('participantes', ParticipantesController::class);
 Route::get('listarParticipantes', [ParticipantesController::class , 'AllParticipantes']);
 Route::get('obtenerCupoParticipante/{part_id}', [ParticipantesController::class , 'buscarCupoParticipante']);
@@ -23,6 +25,8 @@ Route::get('obtenerCupoParticipante/{part_id}', [ParticipantesController::class 
 //Login
 Rest::resource('user', UserController::class);
 Route::post('login', [UserController::class, 'login']);
+// Añadir esta línea en tu archivo de rutas
+Route::post('register', [UserController::class, 'register']);
 
 //Semanas
 Rest::resource('semanas', SemanaComtroller::class);
