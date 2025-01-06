@@ -1,9 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateActualizarEstadoPrestamoTrigger extends Migration
 {
@@ -14,14 +14,14 @@ class CreateActualizarEstadoPrestamoTrigger extends Migration
      */
     public function up()
     {
+        // Crear función para el trigger
         DB::unprepared('
-            CREATE TRIGGER actualizar_estado_prestamo
-            AFTER INSERT ON pagos
-            FOR EACH ROW
+            CREATE OR REPLACE FUNCTION actualizar_estado_prestamo()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                total_pagado DECIMAL(10, 2);
+                monto_total DECIMAL(10, 2);
             BEGIN
-                DECLARE total_pagado DECIMAL(10, 2);
-                DECLARE monto_total DECIMAL(10, 2);  -- Corregido: nombre de la variable
-
                 -- Sumar todos los pagos relacionados con el prestpart_id actual
                 SELECT SUM(valor) INTO total_pagado
                 FROM pagos
@@ -34,17 +34,28 @@ class CreateActualizarEstadoPrestamoTrigger extends Migration
 
                 -- Verificar si el total pagado es igual o superior al monto del préstamo más el interés
                 IF total_pagado >= monto_total THEN
-                    -- Actualizar el estado a "Cancelado"
+                    -- Actualizar el estado a \'Cancelado\'
                     UPDATE prestamos_participante
-                    SET estado = "Cancelado"
+                    SET estado = \'Cancelado\'
                     WHERE id = NEW.prestpart_id;
                 ELSE
-                    -- Actualizar el estado a "Pendiente"
+                    -- Actualizar el estado a \'Pendiente\'
                     UPDATE prestamos_participante
-                    SET estado = "Pendiente"
+                    SET estado = \'Pendiente\'
                     WHERE id = NEW.prestpart_id;
                 END IF;
+
+                RETURN NEW;
             END;
+            $$ LANGUAGE plpgsql;
+        ');
+
+        // Crear trigger
+        DB::unprepared('
+            CREATE TRIGGER actualizar_estado_prestamo
+            AFTER INSERT ON pagos
+            FOR EACH ROW
+            EXECUTE FUNCTION actualizar_estado_prestamo();
         ');
     }
 
@@ -55,6 +66,7 @@ class CreateActualizarEstadoPrestamoTrigger extends Migration
      */
     public function down()
     {
-        DB::unprepared('DROP TRIGGER IF EXISTS actualizar_estado_prestamo');
+        DB::unprepared('DROP TRIGGER IF EXISTS actualizar_estado_prestamo ON pagos;');
+        DB::unprepared('DROP FUNCTION IF EXISTS actualizar_estado_prestamo();');
     }
 }
