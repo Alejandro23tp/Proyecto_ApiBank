@@ -40,9 +40,11 @@ RUN composer install
 # Copiar el script de inicio
 COPY start.sh /var/www/start.sh
 
+# Ajustar permisos de archivo del script de inicio
+RUN chmod +x /var/www/start.sh
+
 # Exponer el puerto 9000
 EXPOSE 9000
 
 # Usar el script de inicio
 CMD ["sh", "/var/www/start.sh"]
-
