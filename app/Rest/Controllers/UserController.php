@@ -19,6 +19,7 @@ class UserController extends RestController
     {
         try {
             $user = User::where('usr_correo', $request->usr_correo)->first();
+
             if ($user && Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'mensaje' => 'Usuario encontrado',
