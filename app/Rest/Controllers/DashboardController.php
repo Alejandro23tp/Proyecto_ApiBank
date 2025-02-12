@@ -13,15 +13,16 @@ use Throwable;
 
 class DashboardController extends BaseController
 {
-    /**
-     * @return JsonResponse
-     */
     public function obtenerDashboardStats(): JsonResponse
     {
         try {
             $totalParticipantes = Participantes::count();
-            $totalPrestamosActivos = PrestamosParticipante::where('pres_estado', 'Activo')->count();
-            $totalPagosRealizados = Pagos::sum('pago_valor');
+            // Corregido: usando estado en lugar de pres_estado
+            $totalPrestamosActivos = DB::table('prestamos_participante')
+                ->where('estado', 'Activo')
+                ->count();
+            $totalPagosRealizados = DB::table('pagos')
+                ->sum('pago_valor');
 
             return response()->json([
                 'mensaje' => 'Estadísticas del Dashboard obtenidas',
@@ -42,14 +43,15 @@ class DashboardController extends BaseController
         }
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function obtenerUltimasTransacciones(): JsonResponse
     {
         try {
-            $ultimasTransacciones = Pagos::with('prestamoParticipante.participante')
-                ->orderBy('created_at', 'desc')
+            // Corregido: usando una consulta más directa sin relaciones
+            $ultimasTransacciones = DB::table('pagos')
+                ->join('prestamos_participante', 'pagos.pres_id', '=', 'prestamos_participante.pres_id')
+                ->join('participantes', 'prestamos_participante.part_id', '=', 'participantes.part_id')
+                ->select('pagos.*', 'participantes.part_nombres', 'participantes.part_apellidos')
+                ->orderBy('pagos.created_at', 'desc')
                 ->take(5)
                 ->get();
 
@@ -68,17 +70,16 @@ class DashboardController extends BaseController
         }
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function obtenerParticipantesDeudores(): JsonResponse
     {
         try {
-            $participantesDeudores = Participantes::select('participantes.*')
-                ->leftJoin('prestamos_participantes', 'participantes.part_id', '=', 'prestamos_participantes.part_id')
-                ->where('prestamos_participantes.pres_estado', 'Activo')
-                ->whereColumn('prestamos_participantes.pres_valor_pendiente', '>', '0')
-                ->groupBy('participantes.part_id')
+            // Corregido: usando nombres de tabla correctos y consulta simplificada
+            $participantesDeudores = DB::table('participantes')
+                ->join('prestamos_participante', 'participantes.part_id', '=', 'prestamos_participante.part_id')
+                ->where('prestamos_participante.estado', 'Activo')
+                ->where('prestamos_participante.valor_pendiente', '>', 0)
+                ->select('participantes.*')
+                ->distinct()
                 ->get();
 
             return response()->json([
