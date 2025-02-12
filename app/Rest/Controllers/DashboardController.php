@@ -8,6 +8,8 @@ use App\Models\Pagos;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class DashboardController extends BaseController
 {
@@ -16,15 +18,20 @@ class DashboardController extends BaseController
      */
     public function obtenerDashboardStats(): JsonResponse
     {
-        $totalParticipantes = Participantes::count();
-        $totalPrestamosActivos = PrestamosParticipante::where('pres_estado', 'Activo')->count();
-        $totalPagosRealizados = Pagos::sum('pago_valor');
+        try {
+            $totalParticipantes = Participantes::count();
+            $totalPrestamosActivos = PrestamosParticipante::where('pres_estado', 'Activo')->count();
+            $totalPagosRealizados = Pagos::sum('pago_valor');
 
-        return response()->json([
-            'totalParticipantes' => $totalParticipantes,
-            'totalPrestamosActivos' => $totalPrestamosActivos,
-            'totalPagosRealizados' => $totalPagosRealizados,
-        ]);
+            return response()->json([
+                'totalParticipantes' => $totalParticipantes,
+                'totalPrestamosActivos' => $totalPrestamosActivos,
+                'totalPagosRealizados' => $totalPagosRealizados,
+            ]);
+        } catch (Throwable $e) {
+            Log::error('Error in obtenerDashboardStats: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
     }
 
     /**
@@ -32,12 +39,17 @@ class DashboardController extends BaseController
      */
     public function obtenerUltimasTransacciones(): JsonResponse
     {
-        $ultimasTransacciones = Pagos::with('prestamoParticipante.participante')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+        try {
+            $ultimasTransacciones = Pagos::with('prestamoParticipante.participante')
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
 
-        return response()->json($ultimasTransacciones);
+            return response()->json($ultimasTransacciones);
+        } catch (Throwable $e) {
+            Log::error('Error in obtenerUltimasTransacciones: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
     }
 
     /**
@@ -45,13 +57,18 @@ class DashboardController extends BaseController
      */
     public function obtenerParticipantesDeudores(): JsonResponse
     {
-        $participantesDeudores = Participantes::select('participantes.*')
-            ->leftJoin('prestamos_participantes', 'participantes.part_id', '=', 'prestamos_participantes.part_id')
-            ->where('prestamos_participantes.pres_estado', 'Activo')
-            ->whereColumn('prestamos_participantes.pres_valor_pendiente', '>', '0')
-            ->groupBy('participantes.part_id')
-            ->get();
+        try {
+            $participantesDeudores = Participantes::select('participantes.*')
+                ->leftJoin('prestamos_participantes', 'participantes.part_id', '=', 'prestamos_participantes.part_id')
+                ->where('prestamos_participantes.pres_estado', 'Activo')
+                ->whereColumn('prestamos_participantes.pres_valor_pendiente', '>', '0')
+                ->groupBy('participantes.part_id')
+                ->get();
 
-        return response()->json($participantesDeudores);
+            return response()->json($participantesDeudores);
+        } catch (Throwable $e) {
+            Log::error('Error in obtenerParticipantesDeudores: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
     }
 }
