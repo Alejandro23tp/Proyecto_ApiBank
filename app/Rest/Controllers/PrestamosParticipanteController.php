@@ -51,5 +51,22 @@ class PrestamosParticipanteController extends RestController
         ]);
     }
     
-    
+    public function cancelarPrestamo(Request $request)
+    {
+        $prestamo = PrestamosParticipante::where('pp_partId', $request->pp_partId)
+                      ->where('pp_semana', $request->pp_semana)
+                      ->update(['estado' => 'Cancelado']);
+
+        if ($prestamo) {
+            return response()->json([
+                'mensaje' => 'Préstamo actualizado a Cancelado',
+                'data' => $prestamo
+            ]);
+        } else {
+            return response()->json([
+                'mensaje' => 'No se encontró el préstamo para cancelar',
+                'data' => null
+            ]);
+        }
+    }
 }

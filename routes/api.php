@@ -38,6 +38,7 @@ Rest::resource('registrarPrestamo', PrestamosParticipanteController::class);
 Route::post('listarPrestamosId', [PrestamosParticipanteController::class, 'ListarxId']);
 Route::get('listarPrestamistas', [PrestamosParticipanteController::class, 'listarAll']);
 Route::post('prestamistasCancelar', [PrestamosParticipanteController::class, 'prestamistassincancelar']);
+Route::post('cancelarPrestamo', [PrestamosParticipanteController::class, 'cancelarPrestamo']);
 
 //PagarPrestamo
 Rest::resource('pagoprestamo', PagosController::class);
