@@ -24,13 +24,21 @@ class DashboardController extends BaseController
             $totalPagosRealizados = Pagos::sum('pago_valor');
 
             return response()->json([
-                'totalParticipantes' => $totalParticipantes,
-                'totalPrestamosActivos' => $totalPrestamosActivos,
-                'totalPagosRealizados' => $totalPagosRealizados,
+                'mensaje' => 'Estadísticas del Dashboard obtenidas',
+                'cant' => 1,
+                'data' => [
+                    'totalParticipantes' => $totalParticipantes,
+                    'totalPrestamosActivos' => $totalPrestamosActivos,
+                    'totalPagosRealizados' => $totalPagosRealizados,
+                ]
             ]);
         } catch (Throwable $e) {
             Log::error('Error in obtenerDashboardStats: ' . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error'], 500);
+            return response()->json([
+                'mensaje' => 'Error al obtener estadísticas del dashboard',
+                'cant' => 0,
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -45,10 +53,18 @@ class DashboardController extends BaseController
                 ->take(5)
                 ->get();
 
-            return response()->json($ultimasTransacciones);
+            return response()->json([
+                'mensaje' => 'Últimas transacciones obtenidas',
+                'cant' => 1,
+                'data' => $ultimasTransacciones
+            ]);
         } catch (Throwable $e) {
             Log::error('Error in obtenerUltimasTransacciones: ' . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error'], 500);
+            return response()->json([
+                'mensaje' => 'Error al obtener las últimas transacciones',
+                'cant' => 0,
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
@@ -65,10 +81,18 @@ class DashboardController extends BaseController
                 ->groupBy('participantes.part_id')
                 ->get();
 
-            return response()->json($participantesDeudores);
+            return response()->json([
+                'mensaje' => 'Participantes deudores obtenidos',
+                'cant' => 1,
+                'data' => $participantesDeudores
+            ]);
         } catch (Throwable $e) {
             Log::error('Error in obtenerParticipantesDeudores: ' . $e->getMessage());
-            return response()->json(['error' => 'Internal Server Error'], 500);
+            return response()->json([
+                'mensaje' => 'Error al obtener los participantes deudores',
+                'cant' => 0,
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
