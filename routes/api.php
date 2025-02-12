@@ -53,3 +53,10 @@ Route::get('calcularSaldoAnterior/{id_tablapresentar_semanas}', [ParticipantesCo
 //Listar Pagos de cadad Participante
 Route::get('listarpagosall', [PagosController::class, 'listarAll']);
 Route::post('listarpagosid', [PagosController::class, 'listarxId']);
+
+//Dashboard
+Route::prefix('dashboard')->group(function () {
+    Route::get('/stats', [DashboardController::class, 'obtenerDashboardStats']);
+    Route::get('/transacciones', [DashboardController::class, 'obtenerUltimasTransacciones']);
+    Route::get('/deudores', [DashboardController::class, 'obtenerParticipantesDeudores']);
+});
