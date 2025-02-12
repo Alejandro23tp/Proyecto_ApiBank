@@ -11,12 +11,11 @@ use App\Rest\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Lomkit\Rest\Facades\Rest;
+use App\Rest\Controllers\DashboardController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-
 
 Rest::resource('participantes', ParticipantesController::class);
 Route::get('listarParticipantes', [ParticipantesController::class , 'AllParticipantes']);
@@ -54,3 +53,8 @@ Route::get('calcularSaldoAnterior/{id_tablapresentar_semanas}', [ParticipantesCo
 //Listar Pagos de cadad Participante
 Route::get('listarpagosall', [PagosController::class, 'listarAll']);
 Route::post('listarpagosid', [PagosController::class, 'listarxId']);
+
+//Dashboard routes
+Route::get('obtenerDashboardStats', [DashboardController::class, 'obtenerDashboardStats']);
+Route::get('obtenerUltimasTransacciones', [DashboardController::class, 'obtenerUltimasTransacciones']);
+Route::get('obtenerParticipantesDeudores', [DashboardController::class, 'obtenerParticipantesDeudores']);
