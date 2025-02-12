@@ -16,7 +16,7 @@ class DashboardController extends Controller
         try {
             $stats = [
                 'totalParticipantes' => Participantes::count(),
-                'totalPrestamos' => PrestamosParticipante::where('estado', 1)->sum('monto') ?? 0,
+                'totalPrestamos' => PrestamosParticipante::where('estado', 'Pendiente')->sum('monto') ?? 0,
                 'totalPagos' => Pagos::sum('monto') ?? 0,
                 'prestamosPendientes' => PrestamosParticipante::where('estado', 1)->count()
             ];
@@ -67,7 +67,7 @@ class DashboardController extends Controller
     public function obtenerParticipantesDeudores()
     {
         try {
-            $deudores = PrestamosParticipante::where('estado', 1)
+            $deudores = PrestamosParticipante::where('estado', 'Pendiente')
                 ->with('participante')
                 ->get()
                 ->map(function ($prestamo) {
