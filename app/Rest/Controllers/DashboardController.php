@@ -37,7 +37,7 @@ class DashboardController extends Controller
     public function obtenerUltimasTransacciones()
     {
         try {
-            $transacciones = DB::select("
+            $transacciones = DB::select('
                 SELECT
                     pagos.id,
                     pagos.created_at,
@@ -45,10 +45,10 @@ class DashboardController extends Controller
                     participante.part_nombre AS participante
                 FROM pagos
                 JOIN prestamos_participante ON pagos.prestpart_id = prestamos_participante.id
-                JOIN participante ON prestamos_participante.pp_partId = participante.id
+                JOIN participante ON prestamos_participante."pp_partId" = participante.id
                 ORDER BY pagos.created_at DESC
                 LIMIT 10
-            ");
+            ');
 
             return response()->json([
                 'status' => 'success',
@@ -68,7 +68,7 @@ class DashboardController extends Controller
     public function obtenerParticipantesDeudores()
     {
         try {
-            $deudores = DB::select("
+            $deudores = DB::select('
                 SELECT
                     pp.id,
                     p.part_nombre AS nombre,
@@ -76,12 +76,12 @@ class DashboardController extends Controller
                     COALESCE(SUM(pg.valor), 0) AS monto_pagado,
                     (pp.pp_prestamo - COALESCE(SUM(pg.valor), 0)) AS monto_restante
                 FROM prestamos_participante pp
-                JOIN participante p ON pp.pp_partId = p.id
+                JOIN participante p ON pp."pp_partId" = p.id
                 LEFT JOIN pagos pg ON pp.id = pg.prestpart_id AND pp.pp_semana = pg.semana
-                WHERE pp.estado = 'Pendiente'
+                WHERE pp.estado = \'Pendiente\'
                 GROUP BY pp.id, p.part_nombre, pp.pp_prestamo
                 ORDER BY pp.id
-            ");
+            ');
 
             return response()->json([
                 'status' => 'success',
@@ -101,20 +101,20 @@ class DashboardController extends Controller
     public function obtenerIntereses()
     {
         try {
-            $intereses = DB::select("
+            $intereses = DB::select('
                 SELECT
                     pp.id,
                     p.part_nombre AS nombre,
                     pp.pp_prestamo AS prestamo,
                     pp.interes,
-                    TO_CHAR(pp.fecha_pago + INTERVAL '1 month', 'Month') AS mes_de_pago,
+                    TO_CHAR(pp.fecha_pago + INTERVAL \'1 month\', \'Month\') AS mes_de_pago,
                     SUM(pp.interes) OVER() AS total_interes,
                     (SUM(pp.interes) OVER()) / (SELECT SUM(part_cupos) FROM participante) AS interes_por_accion
                 FROM prestamos_participante pp
-                JOIN participante p ON pp.pp_partId = p.id
+                JOIN participante p ON pp."pp_partId" = p.id
                 GROUP BY pp.id, p.part_nombre, pp.pp_prestamo, pp.interes, pp.fecha_pago
                 ORDER BY pp.id
-            ");
+            ');
 
             return response()->json([
                 'status' => 'success',
