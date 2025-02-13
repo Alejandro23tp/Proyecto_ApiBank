@@ -42,7 +42,7 @@ Route::post('cancelarPrestamo', [PrestamosParticipanteController::class, 'cancel
 //PagarPrestamo
 Rest::resource('pagoprestamo', PagosController::class);
 
-Route::post('pagarPrestamo', [PagosController::class, 'pagarPrestamo']);
+Route::post('pagoprestamo', [PagosController::class, 'pagarPrestamo']);
 
 //Presentacion de Semanas
 Rest::resource('presentar_semanas', PresentarSemanasController::class);

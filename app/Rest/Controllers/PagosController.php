@@ -37,8 +37,6 @@ class PagosController extends RestController
             'data' => $pagos
         ]);
     }
-
-    // Método para manejar la mutación (pago de préstamo)
     public function pagarPrestamo(Request $request)
     {
         $prestpartId = $request->input('prestpart_id');
