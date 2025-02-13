@@ -59,4 +59,5 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/stats', [DashboardController::class, 'obtenerDashboardStats']);
     Route::get('/transacciones', [DashboardController::class, 'obtenerUltimasTransacciones']);
     Route::get('/deudores', [DashboardController::class, 'obtenerParticipantesDeudores']);
+    Route::get('/intereses', [DashboardController::class, 'obtenerIntereses']);
 });
