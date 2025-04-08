@@ -12,20 +12,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Lomkit\Rest\Facades\Rest;
 use App\Rest\Controllers\DashboardController;
+use App\Http\Controllers\Auth\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth:api');
 
 Rest::resource('participantes', ParticipantesController::class);
 Route::get('listarParticipantes', [ParticipantesController::class , 'AllParticipantes']);
 Route::get('obtenerCupoParticipante/{part_id}', [ParticipantesController::class , 'buscarCupoParticipante']);
 
-//Login
-Rest::resource('user', UserController::class);
-Route::post('login', [UserController::class, 'login']);
-// Añadir esta línea en tu archivo de rutas
-Route::post('register', [UserController::class, 'register']);
+// Los recursos de usuario se manejan ahora a través de la autenticación JWT
 
 //Semanas
 Rest::resource('semanas', SemanaComtroller::class);
@@ -62,4 +59,20 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/transacciones', [DashboardController::class, 'obtenerUltimasTransacciones']);
     Route::get('/deudores', [DashboardController::class, 'obtenerParticipantesDeudores']);
     Route::get('/intereses', [DashboardController::class, 'obtenerIntereses']);
+});
+
+// JWT Authentication routes
+Route::group([
+    'prefix' => 'auth'
+], function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    
+    Route::group([
+        'middleware' => 'auth:api'
+    ], function() {
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('refresh', [AuthController::class, 'refresh']);
+        Route::get('me', [AuthController::class, 'me']);
+    });
 });
