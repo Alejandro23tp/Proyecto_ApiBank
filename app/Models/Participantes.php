@@ -12,6 +12,12 @@ class Participantes extends Model
     protected $fillable = [
         'part_nombre', 
         'part_telefono', 
-        'part_cupos'
+        'part_cupos',
+        'part_cedula'
     ];
+
+    public function authParticipante()
+    {
+        return $this->hasOne(AuthParticipante::class, 'participante_id');
+    }
 }

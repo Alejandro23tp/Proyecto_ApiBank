@@ -44,6 +44,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
+        'participante' => [
+            'driver' => 'jwt',
+            'provider' => 'participantes_auth',
+        ],
     ],
 
     /*
@@ -66,13 +70,12 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\User::class,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'participantes_auth' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\AuthParticipante::class,
+        ],
     ],
 
     /*

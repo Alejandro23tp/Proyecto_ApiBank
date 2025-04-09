@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use Lomkit\Rest\Facades\Rest;
 use App\Rest\Controllers\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ParticipanteAuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -75,4 +76,12 @@ Route::group([
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::get('me', [AuthController::class, 'me']);
     });
+});
+
+// Rutas de autenticación para participantes
+Route::controller(ParticipanteAuthController::class)->prefix('auth/participante')->group(function () {
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+    Route::post('refresh', 'refresh');
+    Route::post('logout', 'logout')->middleware('auth:participante');
 });
