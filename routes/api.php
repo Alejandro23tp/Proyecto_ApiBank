@@ -14,6 +14,7 @@ use Lomkit\Rest\Facades\Rest;
 use App\Rest\Controllers\DashboardController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ParticipanteAuthController;
+use App\Http\Controllers\ParticipanteViewController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -62,6 +63,9 @@ Route::prefix('dashboard')->group(function () {
     Route::get('/intereses', [DashboardController::class, 'obtenerIntereses']);
 });
 
+// Ruta pública para verificación de cédula
+Route::post('verificar-cedula', [ParticipanteAuthController::class, 'verificarCedula']);
+
 // JWT Authentication routes
 Route::group([
     'prefix' => 'auth'
@@ -79,9 +83,18 @@ Route::group([
 });
 
 // Rutas de autenticación para participantes
-Route::controller(ParticipanteAuthController::class)->prefix('auth/participante')->group(function () {
-    Route::post('login', 'login');
-    Route::post('register', 'register');
-    Route::post('refresh', 'refresh');
-    Route::post('logout', 'logout')->middleware('auth:participante');
+Route::group(['prefix' => 'auth/participante', 'middleware' => ['api']], function () {
+    Route::post('login', [ParticipanteAuthController::class, 'login']);
+    Route::post('register', [ParticipanteAuthController::class, 'register']);
+    Route::post('refresh', [ParticipanteAuthController::class, 'refresh']);
+    Route::post('logout', [ParticipanteAuthController::class, 'logout'])->middleware('auth:participante');
+});
+
+// Rutas protegidas para vistas de participantes
+Route::middleware('auth:participante')->prefix('participante')->group(function () {
+    Route::get('perfil', [ParticipanteViewController::class, 'miPerfil']);
+    Route::get('prestamos', [ParticipanteViewController::class, 'misPrestamos']);
+    Route::get('pagos', [ParticipanteViewController::class, 'misPagos']);
+    Route::get('semanas', [ParticipanteViewController::class, 'misSemanas']);
+    Route::get('estado-cuenta', [ParticipanteViewController::class, 'miEstadoCuenta']);
 });

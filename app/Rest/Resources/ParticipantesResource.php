@@ -25,7 +25,8 @@ class ParticipantesResource extends RestResource
             'id',
             'part_nombre',
             'part_telefono',
-            'part_cupos'
+            'part_cupos',
+            'part_cedula' // Agregar el nuevo campo
         ];
     }
 
