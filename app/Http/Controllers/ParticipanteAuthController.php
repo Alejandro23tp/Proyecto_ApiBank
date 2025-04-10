@@ -21,10 +21,17 @@ class ParticipanteAuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
+        $request->validate([
+            'login' => 'required|string',
             'password' => 'required|string',
         ]);
+
+        $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $credentials = [
+            $loginField => $request->login,
+            'password' => $request->password
+        ];
 
         if (!$token = auth('participante')->attempt($credentials)) {
             return response()->json(['error' => 'Credenciales inválidas'], 401);
@@ -37,6 +44,7 @@ class ParticipanteAuthController extends Controller
     {
         $request->validate([
             'email' => 'required|email|unique:auth_participantes',
+            'username' => 'required|string|unique:auth_participantes',
             'password' => 'required|min:6',
             'part_cedula' => 'required|exists:participante,part_cedula'
         ]);
@@ -51,6 +59,7 @@ class ParticipanteAuthController extends Controller
         try {
             $auth = AuthParticipante::create([
                 'email' => $request->email,
+                'username' => $request->username,
                 'password' => Hash::make($request->password),
                 'participante_id' => $participante->id
             ]);

@@ -7,7 +7,12 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class AuthParticipante extends Authenticatable implements JWTSubject
 {
-    protected $fillable = ['email', 'password', 'participante_id'];
+    protected $fillable = [
+        'email',
+        'username',
+        'password',
+        'participante_id'
+    ];
     protected $hidden = ['password', 'remember_token'];
 
     public function participante()

@@ -53,19 +53,20 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'usr_usuario' => 'required|string',
+        $request->validate([
+            'login' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
+        $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'usr_correo' : 'usr_usuario';
 
-        $credentials = $request->only('usr_usuario', 'password');
+        $credentials = [
+            $loginField => $request->login,
+            'password' => $request->password
+        ];
 
         if (!$token = Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Usuario o contraseña incorrectos'], 401);
+            return response()->json(['error' => 'Credenciales inválidas'], 401);
         }
 
         return $this->respondWithToken($token);
